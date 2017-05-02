@@ -1,7 +1,7 @@
 #! /bin/bash
 
 if [ "$(uname)" == "Darwin" ]; then
-    export FEL=./${FEL}
+    export FEL=./sunxi-fel
 else
     if [[ -z "$(which sunxi-fel)" ]]; then
         echo "${FEL} not found. please enter your password to install"
