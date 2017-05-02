@@ -1,5 +1,7 @@
 #! /bin/bash
 
+chmod 0600 id_rsa
+
 if [ "$(uname)" == "Darwin" ]; then
     export FEL=./sunxi-fel
 else
