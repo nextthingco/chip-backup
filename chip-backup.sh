@@ -2,6 +2,21 @@
 
 chmod 0600 id_rsa
 
+slc=false
+mlc=false
+raw=false
+
+for arg in "$@"; do
+    [[ "$arg" == "slc" ]] && export slc=true
+    [[ "$arg" == "mlc" ]] && export mlc=true
+    [[ "$arg" == "raw" ]] && export raw=true
+done
+
+[[ "$mlc" == "true" && "$slc" == "true" ]] && echo "ERROR: chose either slc OR mlc" && exit 1
+[[ "$mlc" == "false" && "$slc" == "false" ]] && echo "ERROR: chose either slc OR mlc" && exit 1
+
+[[ $slc ]] && export EXT=".slc"
+
 if [ "$(uname)" == "Darwin" ]; then
     export FEL=./sunxi-fel
 else
@@ -23,13 +38,13 @@ SPL=${SPL:-$IMAGES/sunxi-spl.bin}
 UBOOT=${UBOOT:-$IMAGES/u-boot-dtb.bin}
 [[ ! -f $UBOOT ]] && echo "ERROR: $UBOOT does not exist" && exit 1 
 
-KERNEL=${KERNEL:-$IMAGES/zImage}
+KERNEL=${KERNEL:-$IMAGES/zImage$EXT}
 [[ ! -f $KERNEL ]] && echo "ERROR: $KERNEL does not exist" && exit 1 
 
-DTB=${DTB:-$IMAGES/sun5i-r8-chip.dtb}
+DTB=${DTB:-$IMAGES/sun5i-r8-chip.dtb$EXT}
 [[ ! -f $DTB ]] && echo "ERROR: $DTB does not exist" && exit 1 
 
-INITRD=${INITRD:-$IMAGES/rootfs.cpio.uboot}
+INITRD=${INITRD:-$IMAGES/rootfs.cpio.uboot$EXT}
 [[ ! -f $INITRD ]] && echo "ERROR: $INITRD does not exist" && exit 1 
 
 SCRIPT=${SCRIPT:-$IMAGES/uboot.script}
@@ -99,7 +114,7 @@ ${SSH} nanddump -o -n /dev/mtd1 >mtd1.bin
 ${SSH} nanddump /dev/mtd2 >mtd2.bin
 ${SSH} nanddump /dev/mtd3 >mtd3.bin
 
-if [[ "$1" == "raw" ]]; then
+if [[ "$raw" == "true" ]]; then
     ${SSH} nanddump /dev/mtd4 >mtd4.bin
 else
     ${SSH} <<EOF
